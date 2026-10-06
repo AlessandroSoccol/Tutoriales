@@ -19,9 +19,17 @@
         <h2>{{ libro.titulo }}</h2>
         <p>Precio con IVA: <strong>${{ total }}</strong></p>
 
+        {% if stock > 0 %}
+            <p>Stock disponible: <strong>{{ stock }}</strong> unidad{{ stock|pluralize }}</p>
+        {% else %}
+            <p style="color: red; font-weight: bold;">Sin existencias</p>
+        {% endif %}
+
         <form method="post">
             {% csrf_token %}
-            <button type="submit" style="padding: 10px 20px; background: #28a745; color: white; border: none; cursor: pointer;">
+            <button type="submit"
+                    {% if stock <= 0 %}disabled{% endif %}
+                    style="padding: 10px 20px; background: #28a745; color: white; border: none; cursor: pointer;">
                 Confirmar Pago con Banco Nacional
             </button>
         </form>

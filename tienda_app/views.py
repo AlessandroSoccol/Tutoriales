@@ -1,21 +1,22 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views import View
+from django.http import HttpResponse
 
 from .infra.factories import PaymentFactory
-from .services import CompraService
+from .services import CompraRapidaService
+from .models import Libro
+
+
+def home(request):
+    return HttpResponse("Bienvenido a la tienda")
 
 
 class CompraView(View):
-    """
-    CBV: Vista Basada en Clases.
-    Actúa como un "Portero": recibe la petición y delega al servicio.
-    """
-
     template_name = 'tienda_app/compra.html'
 
     def setup_service(self):
         gateway = PaymentFactory.get_processor()
-        return CompraService(procesador_pago=gateway)
+        return CompraRapidaService(procesador_pago=gateway)
 
     def get(self, request, libro_id):
         servicio = self.setup_service()
@@ -25,14 +26,11 @@ class CompraView(View):
     def post(self, request, libro_id):
         servicio = self.setup_service()
         try:
-            total = servicio.ejecutar_compra(libro_id, cantidad=1)
+            total = servicio.procesar(libro_id)
             return render(
                 request,
                 self.template_name,
-                {
-                    'mensaje_exito': f"¡Gracias por su compra! Total: ${total}",
-                    'total': total,
-                },
+                {'mensaje_exito': f"¡Gracias por su compra! Total: ${total}", 'total': total},
             )
-        except (ValueError, Exception) as e:
+        except ValueError as e:
             return render(request, self.template_name, {'error': str(e)}, status=400)

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tienda_app',
     'rest_framework',
+    
 ]
 
 MIDDLEWARE = [
@@ -88,7 +89,7 @@ DATABASES = {
         'NAME': os.environ.get('DB_NAME', 'tienda_db'),
         'USER': os.environ.get('DB_USER', 'postgres'),
         'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'), # En Docker será 'db', en local será 'localhost'
+        'HOST': os.environ.get('DB_HOST', 'localhost'),  # Importante para Docker
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
