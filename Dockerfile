@@ -1,20 +1,22 @@
-# 1. Usamos una imagen base oficial de Python ligera
-FROM python:3.11-slim
+# 1. Imagen base: Django 6.x exige Python 3.12 o superior
+FROM python:3.13-slim
 
-# 2. Evitamos que Python escriba archivos .pyc y buffer de logs
+# 2. Evitamos archivos .pyc y buffer de logs
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# 3. Establecemos el directorio de trabajo dentro del contenedor
+# 3. Directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# 4. Copiamos los requerimientos e instalamos dependencias
+# 4. Dependencias
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 5. Copiamos el resto del código fuente
+# 5. Código fuente
 COPY . /app/
 
-# 6. Comando por defecto al iniciar el contenedor
-# Escucha en el puerto 8000 disponible para el mundo (0.0.0.0)
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# 6. Puerto interno (solo lo ve Nginx dentro de la red de Docker)
+EXPOSE 8000
+
+# 7. Comando por defecto: Gunicorn (el paquete del proyecto se llama "Tienda")
+CMD ["gunicorn", "Tienda.wsgi:application", "--bind", "0.0.0.0:8000"]
